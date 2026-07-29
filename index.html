@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ウルトラ百貨店 | 公式サイト</title>
+<meta name="description" content="ウルトラ百貨店の公式サイト。営業時間・アクセス・フロアガイド・催事情報など、ご来店に役立つ情報をご案内します。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ヘッダー（固定：どのページからも来店情報に戻れる導線） -->
+<header class="site-header">
+  <div class="header-inner">
+    <a href="#top" class="logo">ウルトラ百貨店</a>
+
+    <nav class="quick-nav" aria-label="来店情報">
+      <a href="#info-hours">営業時間</a>
+      <a href="#info-access">アクセス</a>
+      <a href="#info-floor">フロアガイド</a>
+    </nav>
+
+    <div class="header-actions">
+      <label class="lang-switch" aria-label="言語切替">
+        <select>
+          <option>日本語</option>
+          <option>English</option>
+          <option>中文</option>
+          <option>한국어</option>
+        </select>
+      </label>
+      <button class="nav-toggle" aria-label="メニューを開く" aria-expanded="false">☰</button>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- ヒーロー -->
+  <section class="hero">
+    <div class="hero-slider" id="hero-slider" aria-roledescription="カルーセル" aria-label="外観・催事・季節のご紹介">
+
+      <div class="hero-slide is-active" data-slide="0" role="group" aria-roledescription="スライド" aria-label="1 / 4">
+        <div class="hero-photo hero-photo--exterior" role="img" aria-label="ウルトラ百貨店の外観"></div>
+        <p class="hero-slide-caption">ウルトラ百貨店 外観</p>
+      </div>
+
+      <div class="hero-slide" data-slide="1" role="group" aria-roledescription="スライド" aria-label="2 / 4">
+        <div class="hero-photo hero-photo--event" role="img" aria-label="夏の物産展の様子"></div>
+        <p class="hero-slide-caption">2026.07.05 - 07.20　夏の物産展</p>
+      </div>
+
+      <div class="hero-slide" data-slide="2" role="group" aria-roledescription="スライド" aria-label="3 / 4">
+        <div class="hero-photo hero-photo--season" role="img" aria-label="季節のおすすめ特集の売り場"></div>
+        <p class="hero-slide-caption">季節のおすすめ特集を開催中</p>
+      </div>
+
+      <div class="hero-slide" data-slide="3" role="group" aria-roledescription="スライド" aria-label="4 / 4">
+        <div class="hero-photo hero-photo--interior" role="img" aria-label="店内の様子"></div>
+        <p class="hero-slide-caption">上質なひとときを、店内で</p>
+      </div>
+
+      <button type="button" class="hero-nav hero-nav-prev" aria-label="前のスライドへ">‹</button>
+      <button type="button" class="hero-nav hero-nav-next" aria-label="次のスライドへ">›</button>
+
+      <div class="hero-dots" role="tablist" aria-label="スライドを選択">
+        <button type="button" class="hero-dot is-active" role="tab" aria-selected="true" aria-label="1枚目のスライドを表示" data-index="0"></button>
+        <button type="button" class="hero-dot" role="tab" aria-selected="false" aria-label="2枚目のスライドを表示" data-index="1"></button>
+        <button type="button" class="hero-dot" role="tab" aria-selected="false" aria-label="3枚目のスライドを表示" data-index="2"></button>
+        <button type="button" class="hero-dot" role="tab" aria-selected="false" aria-label="4枚目のスライドを表示" data-index="3"></button>
+      </div>
+    </div>
+
+    <div class="hero-text">
+      <p class="hero-eyebrow">ウルトラ百貨店 公式サイト</p>
+      <h1>あなたのための入口が、<br>ここにあります。</h1>
+      <p class="hero-lead">どんな方にも、迷わず・自分らしく、お楽しみいただける場所へ。</p>
+      <a href="#segments" class="btn btn-primary">自分に合った入口を見つける</a>
+    </div>
+  </section>
+
+  <!-- 客層ごとの入口（5客層） -->
+  <section class="segments" id="segments" aria-label="お客様に合わせたご案内">
+    <div class="section-head">
+      <h2>あなたに合わせたご案内</h2>
+      <p class="section-lead">気になる入口から、それぞれのお楽しみ方をご覧いただけます。</p>
+    </div>
+
+    <div class="segment-grid">
+      <a class="segment-card" href="#">
+        <div class="segment-photo segment-photo--senior" role="img" aria-label="上質な買い物風景"></div>
+        <span class="segment-icon" aria-hidden="true">◆</span>
+        <h3>上質なひとときを</h3>
+        <p>富裕層・シニアのお客様へ。落ち着いた空間で、上質な逸品との出会いを。</p>
+        <span class="segment-link">詳しく見る ›</span>
+      </a>
+
+      <a class="segment-card" href="#">
+        <div class="segment-photo segment-photo--family" role="img" aria-label="家族での来店風景"></div>
+        <span class="segment-icon" aria-hidden="true">◆</span>
+        <h3>家族で楽しむ一日</h3>
+        <p>ファミリー層のお客様へ。キッズスペースやお子様向けサービスのご案内。</p>
+        <span class="segment-link">詳しく見る ›</span>
+      </a>
+
+      <a class="segment-card" href="#">
+        <div class="segment-photo segment-photo--youth" role="img" aria-label="トレンド発信の様子"></div>
+        <span class="segment-icon" aria-hidden="true">◆</span>
+        <h3>いま気になるトレンド</h3>
+        <p>若年層・Z世代のお客様へ。話題のブランドやイベント情報をチェック。</p>
+        <span class="segment-link">詳しく見る ›</span>
+      </a>
+
+      <a class="segment-card" href="#">
+        <div class="segment-photo segment-photo--inbound" role="img" aria-label="免税カウンターの様子"></div>
+        <span class="segment-icon" aria-hidden="true">◆</span>
+        <h3>Welcome to Japan</h3>
+        <p>海外からのお客様へ。免税サービスや多言語対応のご案内（Tax-Free / Multilingual）。</p>
+        <span class="segment-link">詳しく見る ›</span>
+      </a>
+
+      <a class="segment-card" href="#">
+        <div class="segment-photo segment-photo--pet" role="img" aria-label="ペット同伴での来店風景"></div>
+        <span class="segment-icon" aria-hidden="true">◆</span>
+        <h3>ペットと一緒に</h3>
+        <p>ペット同伴のお客様へ。同伴可能エリアやサービスのご案内。</p>
+        <span class="segment-link">詳しく見る ›</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- 来店動機（催事・フェア・季節のおすすめ・ニュース） -->
+  <section class="events" aria-label="催事・ニュース">
+    <div class="section-head">
+      <h2>催事・ニュース</h2>
+      <p class="section-lead">今、店内で楽しめること。</p>
+    </div>
+
+    <div class="event-grid">
+      <article class="event-card">
+        <div class="event-photo event-photo--bussanten" role="img" aria-label="夏の物産展の様子"></div>
+        <p class="event-date">2026.07.05 - 07.20</p>
+        <h3>夏の物産展</h3>
+        <p>全国の逸品が集まる、恒例の物産フェアを開催。</p>
+      </article>
+
+      <article class="event-card">
+        <div class="event-photo event-photo--season" role="img" aria-label="季節のおすすめ特集の売り場"></div>
+        <p class="event-date">2026.07.01 -</p>
+        <h3>季節のおすすめ特集</h3>
+        <p>今の時季ならではのアイテムをセレクトしてご紹介。</p>
+      </article>
+
+      <article class="event-card">
+        <div class="event-photo event-photo--news" role="img" aria-label="お知らせ・案内カウンターの様子"></div>
+        <p class="event-date">2026.06.20</p>
+        <h3>お知らせ</h3>
+        <p>営業時間変更など、最新のお知らせはこちら。</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- 来店情報（営業時間・アクセス・駐車場・フロアガイド・各種サービス） -->
+  <section class="visit-info" aria-label="ご来店情報">
+    <div class="section-head">
+      <h2>ご来店情報</h2>
+      <p class="section-lead">スムーズにお越しいただくために。</p>
+    </div>
+
+    <div class="info-grid">
+      <div class="info-card" id="info-hours">
+        <h3>営業時間</h3>
+        <p>10:00 - 20:00（フロアにより異なります）</p>
+      </div>
+      <div class="info-card" id="info-access">
+        <h3>アクセス</h3>
+        <p>〇〇駅より徒歩◯分／住所：〇〇県〇〇市〇〇</p>
+      </div>
+      <div class="info-card">
+        <h3>駐車場</h3>
+        <p>〇〇台完備（お買い上げ金額に応じてサービス券あり）</p>
+      </div>
+      <div class="info-card" id="info-floor">
+        <h3>フロアガイド</h3>
+        <p>B1〜8階までのフロア構成をご案内します。</p>
+      </div>
+      <div class="info-card">
+        <h3>各種サービス</h3>
+        <p>ラッピング・外商・免税・コンシェルジュなど。</p>
+      </div>
+      <div class="info-card weather-card" id="info-weather">
+        <h3>本日の天気（尼崎市）</h3>
+        <div class="weather-widget" id="weather-widget" aria-live="polite">
+          <p class="weather-loading">天気情報を取得中…</p>
+        </div>
+        <p class="weather-credit">Weather data by <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo.com</a></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 信頼・ブランド -->
+  <section class="brand" aria-label="百貨店の想い">
+    <div class="brand-photo" role="img" aria-label="上質なフラッグシップフロアの様子"></div>
+    <div class="brand-text">
+      <h2>変わらぬ品質で、<br>いつもの安心を。</h2>
+      <p>ウルトラ百貨店は、長年にわたり地域のお客様に寄り添いながら、確かな品質と心のこもったおもてなしをお届けしてまいりました。これからも、すべてのお客様が自分らしく過ごせる場所であり続けます。</p>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <p class="footer-logo">ウルトラ百貨店</p>
+    <p>〒000-0000　〇〇県〇〇市〇〇1-2-3</p>
+    <p>TEL: 000-000-0000</p>
+    <p class="footer-copyright">&copy; 2026 ウルトラ百貨店</p>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+<script src="weather.js"></script>
+</body>
+</html>

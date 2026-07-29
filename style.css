@@ -1,0 +1,535 @@
+/* ===================================================
+   ウルトラ百貨店 公式サイト スタイルシート
+   デザイン方針：「上品で中立な玄関 ＋ 客層ごとに分かれた明快な入口」
+   =================================================== */
+
+:root {
+  /* 配色（提案）：上品・中立・普遍トーン */
+  --color-bg: #FAF7F2;
+  --color-bg-alt: #F2ECE1;
+  --color-surface: #FFFFFF;
+  --color-text: #2B2825;
+  --color-text-sub: #5C574F;
+  --color-accent: #A6824F;
+  --color-accent-dark: #7C5E38;
+  --color-border: #E4DDD0;
+
+  /* フォント（提案）：見出し=明朝／本文=ゴシック。可読性重視で大きめサイズ */
+  --font-heading: "Noto Serif JP", serif;
+  --font-body: "Noto Sans JP", sans-serif;
+
+  --header-height: 76px;
+  --max-width: 1120px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; scroll-padding-top: var(--header-height); }
+
+body {
+  font-family: var(--font-body);
+  color: var(--color-text);
+  background: var(--color-bg);
+  font-size: 17px;
+  line-height: 1.9;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 { font-family: var(--font-heading); font-weight: 700; line-height: 1.5; }
+
+a { color: inherit; text-decoration: none; }
+
+img { max-width: 100%; display: block; }
+
+.section-head { text-align: center; max-width: 640px; margin: 0 auto 48px; padding: 0 20px; }
+.section-head h2 { font-size: 30px; margin-bottom: 12px; }
+.section-lead { color: var(--color-text-sub); font-size: 16px; }
+
+section { padding: 96px 24px; }
+
+/* ---------- ヘッダー（固定：どのページからも来店情報へ） ---------- */
+.site-header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: var(--header-height);
+  background: rgba(250, 247, 242, 0.92);
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid var(--color-border);
+  z-index: 100;
+}
+
+.header-inner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+}
+
+.logo {
+  font-family: var(--font-heading);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.quick-nav {
+  display: flex;
+  gap: 32px;
+}
+
+.quick-nav a {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--color-text-sub);
+  padding-bottom: 4px;
+  border-bottom: 1px solid transparent;
+  transition: border-color .2s, color .2s;
+}
+
+.quick-nav a:hover { color: var(--color-accent-dark); border-color: var(--color-accent); }
+
+.header-actions { display: flex; align-items: center; gap: 16px; }
+
+.lang-switch select {
+  font-family: var(--font-body);
+  font-size: 14px;
+  padding: 6px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.nav-toggle {
+  display: none;
+  font-size: 22px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text);
+}
+
+/* ---------- ヒーロー ---------- */
+main { padding-top: var(--header-height); }
+
+.hero {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  align-items: stretch;
+  gap: 0;
+  padding: 0;
+  min-height: 560px;
+}
+
+/* ---------- ヒーロー：カルーセル ---------- */
+.hero-slider {
+  position: relative;
+  overflow: hidden;
+  min-height: 560px;
+}
+
+.hero-slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 1s ease;
+}
+
+.hero-slide.is-active {
+  opacity: 1;
+  visibility: visible;
+  z-index: 1;
+}
+
+.hero-photo {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #E9E1D2, #D8CBB0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-sub);
+  font-size: 14px;
+  letter-spacing: .05em;
+}
+
+.hero-photo--exterior { background: url("images/hero-01-exterior.png") center/cover no-repeat; }
+.hero-photo--event { background: url("images/hero-02-event-bussanten.png") center/cover no-repeat; }
+.hero-photo--season { background: url("images/hero-03-season.png") center/cover no-repeat; }
+.hero-photo--interior { background: url("images/hero-04-interior.png") center/cover no-repeat; }
+
+.hero-slide-caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: 0;
+  padding: 14px 28px;
+  background: linear-gradient(0deg, rgba(43,40,37,.55), rgba(43,40,37,0));
+  color: #fff;
+  font-size: 14px;
+  letter-spacing: .03em;
+}
+
+.hero-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.75);
+  color: var(--color-text);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background .2s;
+}
+
+.hero-nav:hover { background: rgba(255, 255, 255, 0.95); }
+
+.hero-nav-prev { left: 20px; }
+.hero-nav-next { right: 20px; }
+
+.hero-dots {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 44px;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.hero-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.35);
+  padding: 0;
+  cursor: pointer;
+  transition: background .2s, transform .2s;
+}
+
+.hero-dot.is-active {
+  background: #fff;
+  transform: scale(1.15);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-slide { transition: none; }
+}
+
+.hero-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 64px;
+  background: var(--color-bg-alt);
+}
+
+.hero-eyebrow {
+  color: var(--color-accent-dark);
+  font-size: 14px;
+  letter-spacing: .1em;
+  margin-bottom: 16px;
+}
+
+.hero-text h1 {
+  font-size: 38px;
+  margin-bottom: 20px;
+}
+
+.hero-lead {
+  color: var(--color-text-sub);
+  font-size: 17px;
+  margin-bottom: 32px;
+}
+
+.btn {
+  display: inline-block;
+  padding: 14px 32px;
+  border-radius: 2px;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: .03em;
+  width: fit-content;
+}
+
+.btn-primary {
+  background: var(--color-accent);
+  color: #fff;
+  transition: background .2s;
+}
+
+.btn-primary:hover { background: var(--color-accent-dark); }
+
+/* ---------- 5客層入口 ---------- */
+.segments { background: var(--color-bg); }
+
+.segment-grid {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+}
+
+.segment-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform .2s, box-shadow .2s;
+}
+
+.segment-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(43, 40, 37, 0.08);
+}
+
+.segment-photo {
+  height: 160px;
+  background: var(--color-bg-alt) center/cover no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-sub);
+  font-size: 13px;
+}
+
+.segment-photo--senior { background-image: url("images/segment-01-senior.png"); }
+.segment-photo--family { background-image: url("images/segment-02-family.png"); }
+.segment-photo--youth { background-image: url("images/segment-03-youth.png"); }
+.segment-photo--inbound { background-image: url("images/segment-04-inbound.png"); }
+.segment-photo--pet { background-image: url("images/segment-05-pet.png"); }
+
+.segment-card h3, .segment-card p, .segment-icon, .segment-link {
+  padding-left: 24px;
+  padding-right: 24px;
+}
+
+.segment-icon {
+  color: var(--color-accent);
+  margin-top: 20px;
+  font-size: 18px;
+}
+
+.segment-card h3 { font-size: 19px; margin-top: 8px; margin-bottom: 10px; }
+.segment-card p { color: var(--color-text-sub); font-size: 15px; flex-grow: 1; }
+
+.segment-link {
+  display: block;
+  color: var(--color-accent-dark);
+  font-weight: 500;
+  font-size: 14px;
+  margin: 16px 0 24px;
+}
+
+/* ---------- 催事・ニュース ---------- */
+.events { background: var(--color-bg-alt); }
+
+.event-grid {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+}
+
+.event-card {
+  background: var(--color-surface);
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+}
+
+.event-photo {
+  height: 140px;
+  background: #EFE7D8 center/cover no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-sub);
+  font-size: 13px;
+}
+
+.event-photo--bussanten { background-image: url("images/event-01-bussanten.png"); }
+.event-photo--season { background-image: url("images/event-02-season.png"); }
+.event-photo--news { background-image: url("images/event-03-news.png"); }
+
+.event-card .event-date { font-size: 13px; color: var(--color-accent-dark); margin: 16px 24px 6px; }
+.event-card h3 { font-size: 18px; margin: 0 24px 8px; }
+.event-card p { font-size: 14px; color: var(--color-text-sub); margin: 0 24px 24px; }
+
+/* ---------- 来店情報 ---------- */
+.visit-info { background: var(--color-bg); }
+
+.info-grid {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.info-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 28px;
+}
+
+.info-card h3 {
+  font-size: 17px;
+  margin-bottom: 10px;
+  color: var(--color-accent-dark);
+}
+
+.info-card p { font-size: 15px; color: var(--color-text-sub); }
+
+/* ---------- 天気ウィジェット（Open-Meteo） ---------- */
+.weather-card { display: flex; flex-direction: column; }
+
+.weather-loading,
+.weather-error {
+  font-size: 14px;
+  color: var(--color-text-sub);
+}
+
+.weather-now {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.weather-now-icon { font-size: 34px; line-height: 1; }
+
+.weather-now-main { display: flex; flex-direction: column; }
+
+.weather-now-temp {
+  font-family: var(--font-heading);
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.weather-now-desc { font-size: 13px; color: var(--color-text-sub); }
+
+.weather-forecast {
+  display: flex;
+  gap: 8px;
+}
+
+.weather-day {
+  flex: 1;
+  text-align: center;
+  background: var(--color-bg-alt);
+  border-radius: 4px;
+  padding: 10px 4px;
+}
+
+.weather-day-label {
+  font-size: 12px;
+  color: var(--color-text-sub);
+  margin-bottom: 4px;
+}
+
+.weather-day-icon { font-size: 18px; }
+
+.weather-day-temp {
+  font-size: 12px;
+  margin-top: 4px;
+  color: var(--color-text-sub);
+}
+
+.weather-day-temp .weather-day-max { color: var(--color-text); font-weight: 500; }
+
+.weather-credit {
+  font-size: 11px;
+  color: var(--color-text-sub);
+  opacity: .7;
+  margin-top: 14px;
+}
+
+.weather-credit a { text-decoration: underline; }
+
+/* ---------- 信頼・ブランド ---------- */
+.brand {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: stretch;
+  padding: 0;
+  background: var(--color-bg-alt);
+}
+
+.brand-photo {
+  background: url("images/brand-01-flagship.png") center/cover no-repeat;
+  min-height: 420px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-sub);
+  font-size: 14px;
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 64px;
+}
+
+.brand-text h2 { font-size: 30px; margin-bottom: 20px; }
+.brand-text p { color: var(--color-text-sub); font-size: 16px; }
+
+/* ---------- フッター ---------- */
+.site-footer {
+  background: var(--color-text);
+  color: var(--color-bg);
+  padding: 56px 24px;
+  text-align: center;
+}
+
+.footer-logo {
+  font-family: var(--font-heading);
+  font-size: 20px;
+  margin-bottom: 16px;
+}
+
+.footer-inner p { font-size: 14px; opacity: .85; margin-bottom: 6px; }
+.footer-copyright { margin-top: 20px; opacity: .6; }
+
+/* ---------- レスポンシブ ---------- */
+@media (max-width: 900px) {
+  .hero { grid-template-columns: 1fr; min-height: auto; }
+  .hero-slider { min-height: 280px; height: 280px; }
+  .hero-photo { height: 280px; }
+  .hero-nav { width: 34px; height: 34px; font-size: 17px; }
+  .hero-dots { bottom: 16px; }
+  .hero-text { padding: 40px 28px; }
+  .segment-grid, .event-grid, .info-grid { grid-template-columns: repeat(2, 1fr); }
+  .brand { grid-template-columns: 1fr; }
+  .brand-photo { min-height: 260px; }
+  .brand-text { padding: 40px 28px; }
+}
+
+@media (max-width: 640px) {
+  section { padding: 64px 20px; }
+  .quick-nav { display: none; }
+  .nav-toggle { display: block; }
+  .segment-grid, .event-grid, .info-grid { grid-template-columns: 1fr; }
+  .hero-text h1 { font-size: 28px; }
+  body { font-size: 16px; }
+}

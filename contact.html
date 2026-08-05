@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>お問い合わせ | ウルトラ百貨店</title>
+<meta name="description" content="ウルトラ百貨店へのお問い合わせはこちらから。ご意見・ご質問など、お気軽にお送りください。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ヘッダー（固定：どのページからも来店情報に戻れる導線） -->
+<header class="site-header">
+  <div class="header-inner">
+    <a href="index.html#top" class="logo">ウルトラ百貨店</a>
+
+    <nav class="quick-nav" aria-label="来店情報">
+      <a href="index.html#info-hours">営業時間</a>
+      <a href="index.html#info-access">アクセス</a>
+      <a href="index.html#info-floor">フロアガイド</a>
+      <a href="contact.html">お問い合わせ</a>
+    </nav>
+
+    <div class="header-actions">
+      <label class="lang-switch" aria-label="言語切替">
+        <select>
+          <option>日本語</option>
+          <option>English</option>
+          <option>中文</option>
+          <option>한국어</option>
+        </select>
+      </label>
+      <button class="nav-toggle" aria-label="メニューを開く" aria-expanded="false">☰</button>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- ページタイトル -->
+  <section class="page-hero" aria-label="お問い合わせ">
+    <div class="section-head">
+      <h1>お問い合わせ</h1>
+      <p class="section-lead">ご意見・ご質問など、お気軽にお送りください。内容を確認のうえ、担当より折り返しご連絡いたします。</p>
+    </div>
+  </section>
+
+  <!-- お問い合わせフォーム -->
+  <section class="contact" aria-label="お問い合わせフォーム">
+    <form class="contact-form" id="contact-form" novalidate>
+
+      <!-- スパム対策（人の目には見えない項目） -->
+      <input type="text" name="_gotcha" class="form-hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+
+      <div class="form-group">
+        <label for="name">お名前<span class="required">必須</span></label>
+        <input type="text" id="name" name="name" autocomplete="name" required>
+      </div>
+
+      <div class="form-group">
+        <label for="email">メールアドレス<span class="required">必須</span></label>
+        <input type="email" id="email" name="email" autocomplete="email" required>
+      </div>
+
+      <div class="form-group">
+        <label for="tel">電話番号</label>
+        <input type="tel" id="tel" name="tel" autocomplete="tel">
+      </div>
+
+      <div class="form-group">
+        <label for="message">お問い合わせ内容<span class="required">必須</span></label>
+        <textarea id="message" name="message" rows="7" required></textarea>
+      </div>
+
+      <p class="form-note">送信いただいた内容は、お問い合わせへの回答のみに利用いたします。</p>
+
+      <p class="form-error" id="form-error" role="alert" hidden></p>
+
+      <button type="submit" class="btn btn-primary">送信する</button>
+    </form>
+
+    <!-- 送信完了画面（入力内容を表示） -->
+    <div class="form-success" id="form-success" role="status" tabindex="-1" hidden>
+      <p>お問い合わせを受け付けました。</p>
+      <p class="form-note">お問い合わせいただき、ありがとうございます。内容を確認のうえ、担当より折り返しご連絡いたします。</p>
+
+      <dl class="form-summary" id="form-summary"></dl>
+
+      <div class="form-success-actions">
+        <button type="button" class="btn btn-primary" id="form-reset">続けて入力する</button>
+        <a href="index.html#top" class="btn btn-ghost">トップへ戻る</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <p class="footer-logo">ウルトラ百貨店</p>
+    <p>〒000-0000　〇〇県〇〇市〇〇1-2-3</p>
+    <p>TEL: 000-000-0000</p>
+    <p><a href="contact.html">お問い合わせ</a></p>
+    <p class="footer-copyright">&copy; 2026 ウルトラ百貨店</p>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+<script src="contact.js"></script>
+</body>
+</html>

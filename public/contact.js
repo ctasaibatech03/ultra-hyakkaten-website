@@ -1,7 +1,7 @@
 /* ===================================================
    ウルトラ百貨店 公式サイト
-   お問い合わせフォーム：画面内で完結（サーバー送信なし）
-   送信後、入力内容と受付完了メッセージを表示する
+   お問い合わせフォーム：/api/contact へサーバー送信する
+   送信後、入力内容と受付完了メッセージを画面に表示する
    =================================================== */
 (function () {
   const form = document.getElementById('contact-form');
@@ -71,14 +71,32 @@
       return;
     }
 
-    renderSummary();
+    // サーバーへ送信し、成功した場合のみ完了画面を表示する
+    fetch('/api/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: document.getElementById('name').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        tel: document.getElementById('tel').value.trim(),
+        message: document.getElementById('message').value.trim()
+      })
+    })
+      .then(function (res) {
+        if (!res.ok) throw new Error('request failed');
 
-    form.hidden = true;
-    if (successBox) {
-      successBox.hidden = false;
-      successBox.focus();
-      successBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+        renderSummary();
+
+        form.hidden = true;
+        if (successBox) {
+          successBox.hidden = false;
+          successBox.focus();
+          successBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      })
+      .catch(function () {
+        showError('送信に失敗しました。時間をおいて再度お試しください。');
+      });
   });
 
   // 「続けて入力する」でフォームに戻る

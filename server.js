@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const path = require('path');
+const crypto = require('crypto');
 const { Resend } = require('resend');
 
 const app = express();
@@ -9,6 +10,121 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
+
+// ---- 管理画面ログイン ----
+
+const ADMIN_USERS = {
+  tencho: { label: '店長', password: process.env.TENCHO_PASSWORD, canEdit: true },
+  staff: { label: 'スタッフ', password: process.env.STAFF_PASSWORD, canEdit: false }
+};
+
+const SESSION_COOKIE = 'admin_sid';
+const SESSION_TTL_MS = 8 * 60 * 60 * 1000; // 8時間
+const sessions = new Map(); // sid -> { userId, expiresAt }
+
+const LOGIN_MAX_FAILURES = 5;
+const LOGIN_LOCK_MS = 15 * 60 * 1000; // 15分
+const loginFailures = new Map(); // ip -> { count, firstAt }
+
+function safeEqual(a, b) {
+  const ha = crypto.createHash('sha256').update(String(a)).digest();
+  const hb = crypto.createHash('sha256').update(String(b)).digest();
+  return crypto.timingSafeEqual(ha, hb);
+}
+
+function getCookie(req, name) {
+  const header = req.headers.cookie || '';
+  for (const part of header.split(';')) {
+    const [key, ...rest] = part.trim().split('=');
+    if (key === name) return decodeURIComponent(rest.join('='));
+  }
+  return null;
+}
+
+function getSession(req) {
+  const sid = getCookie(req, SESSION_COOKIE);
+  if (!sid) return null;
+  const session = sessions.get(sid);
+  if (!session) return null;
+  if (session.expiresAt < Date.now()) {
+    sessions.delete(sid);
+    return null;
+  }
+  return { sid, ...session };
+}
+
+function sessionCookie(value, maxAgeSec) {
+  const secure = process.env.NODE_ENV === 'production' ? '; Secure' : '';
+  return `${SESSION_COOKIE}=${value}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${maxAgeSec}${secure}`;
+}
+
+function requireLoginPage(req, res, next) {
+  const session = getSession(req);
+  if (!session) return res.redirect('/login');
+  req.adminUser = session.userId;
+  next();
+}
+
+function requireLoginApi(req, res, next) {
+  const session = getSession(req);
+  if (!session) return res.status(401).json({ message: 'ログインしてください' });
+  req.adminUser = session.userId;
+  next();
+}
+
+// 変更系のAPIは canEdit のユーザー（店長）だけに許可する
+function requireEditor(req, res, next) {
+  if (!ADMIN_USERS[req.adminUser].canEdit) {
+    return res.status(403).json({ message: 'この操作を行う権限がありません' });
+  }
+  next();
+}
+
+app.get('/login', (req, res) => {
+  if (getSession(req)) return res.redirect('/admin');
+  res.sendFile(path.join(__dirname, 'views', 'login.html'));
+});
+
+app.post('/api/login', (req, res) => {
+  const ip = req.ip;
+  const failure = loginFailures.get(ip);
+  if (failure && Date.now() - failure.firstAt > LOGIN_LOCK_MS) {
+    loginFailures.delete(ip);
+  } else if (failure && failure.count >= LOGIN_MAX_FAILURES) {
+    return res.status(429).json({ message: 'ログインに続けて失敗したため、しばらく時間をおいてお試しください' });
+  }
+
+  const { id, password } = req.body || {};
+  const user = Object.hasOwn(ADMIN_USERS, id) ? ADMIN_USERS[id] : null;
+
+  // パスワード未設定のIDではログインさせない
+  if (!user || !user.password || !password || !safeEqual(password, user.password)) {
+    const current = loginFailures.get(ip) || { count: 0, firstAt: Date.now() };
+    current.count += 1;
+    loginFailures.set(ip, current);
+    console.warn(`[ログイン失敗] ${new Date().toLocaleString('ja-JP')} ID:${String(id).slice(0, 50)} IP:${ip}`);
+    return res.status(401).json({ message: 'IDまたはパスワードが正しくありません' });
+  }
+
+  loginFailures.delete(ip);
+  const sid = crypto.randomBytes(32).toString('hex');
+  sessions.set(sid, { userId: id, expiresAt: Date.now() + SESSION_TTL_MS });
+  res.setHeader('Set-Cookie', sessionCookie(sid, SESSION_TTL_MS / 1000));
+  console.log(`[ログイン] ${new Date().toLocaleString('ja-JP')} ID:${id}`);
+  res.json({ message: 'ログインしました' });
+});
+
+app.post('/api/logout', (req, res) => {
+  const session = getSession(req);
+  if (session) sessions.delete(session.sid);
+  res.setHeader('Set-Cookie', sessionCookie('', 0));
+  res.json({ message: 'ログアウトしました' });
+});
+
+app.get('/api/admin/me', requireLoginApi, (req, res) => {
+  const user = ADMIN_USERS[req.adminUser];
+  res.json({ id: req.adminUser, label: user.label, canEdit: user.canEdit });
+});
 
 app.post('/api/contact', async (req, res) => {
   const { name, email, tel, message } = req.body;
@@ -54,6 +170,119 @@ app.post('/api/contact', async (req, res) => {
   } catch (err) {
     console.error('[メール送信エラー]', err);
     res.status(500).json({ message: 'メール送信に失敗しました' });
+  }
+});
+
+app.get('/admin', requireLoginPage, (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'admin.html'));
+});
+
+app.get('/api/admin/contacts', requireLoginApi, async (req, res) => {
+  try {
+    const dbRes = await fetch(
+      `${process.env.SUPABASE_URL}/rest/v1/ultra_hyakkaten_contacts?select=id,name,email,tel,message,status,created_at&order=created_at.desc`,
+      {
+        headers: {
+          apikey: process.env.SUPABASE_SERVICE_ROLE_KEY,
+          Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`
+        }
+      }
+    );
+
+    if (!dbRes.ok) {
+      console.error('[お問い合わせ取得エラー]', dbRes.status, await dbRes.text());
+      return res.status(500).json({ message: 'お問い合わせの取得に失敗しました' });
+    }
+
+    const contacts = await dbRes.json();
+    res.json(contacts);
+  } catch (err) {
+    console.error('[お問い合わせ取得エラー]', err);
+    res.status(500).json({ message: 'お問い合わせの取得に失敗しました' });
+  }
+});
+
+const CONTACT_STATUSES = ['未対応', '対応中', '対応済み'];
+
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+app.patch('/api/admin/contacts/:id', requireLoginApi, requireEditor, async (req, res) => {
+  const { id } = req.params;
+  const { name, email, tel, message, status } = req.body;
+
+  if (!/^\d+$/.test(id)) {
+    return res.status(400).json({ message: '不正なIDです' });
+  }
+
+  const update = {};
+
+  if (name !== undefined) {
+    const trimmed = String(name).trim();
+    if (!trimmed || trimmed.length > 100) {
+      return res.status(400).json({ message: 'お名前を確認してください' });
+    }
+    update.name = trimmed;
+  }
+
+  if (email !== undefined) {
+    const trimmed = String(email).trim();
+    if (!EMAIL_PATTERN.test(trimmed) || trimmed.length > 255) {
+      return res.status(400).json({ message: 'メールアドレスを確認してください' });
+    }
+    update.email = trimmed;
+  }
+
+  if (tel !== undefined) {
+    const trimmed = String(tel).trim();
+    if (trimmed.length > 20) {
+      return res.status(400).json({ message: '電話番号を確認してください' });
+    }
+    update.tel = trimmed || null;
+  }
+
+  if (message !== undefined) {
+    const trimmed = String(message).trim();
+    if (!trimmed) {
+      return res.status(400).json({ message: 'お問い合わせ内容を確認してください' });
+    }
+    update.message = trimmed;
+  }
+
+  if (status !== undefined) {
+    if (!CONTACT_STATUSES.includes(status)) {
+      return res.status(400).json({ message: '不正な状態です' });
+    }
+    update.status = status;
+  }
+
+  if (Object.keys(update).length === 0) {
+    return res.status(400).json({ message: '更新する項目がありません' });
+  }
+
+  try {
+    const dbRes = await fetch(
+      `${process.env.SUPABASE_URL}/rest/v1/ultra_hyakkaten_contacts?id=eq.${id}`,
+      {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          apikey: process.env.SUPABASE_SERVICE_ROLE_KEY,
+          Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
+          Prefer: 'return=minimal'
+        },
+        body: JSON.stringify(update)
+      }
+    );
+
+    if (!dbRes.ok) {
+      console.error('[お問い合わせ更新エラー]', dbRes.status, await dbRes.text());
+      return res.status(500).json({ message: '更新に失敗しました' });
+    }
+
+    res.json({ message: '更新しました' });
+  } catch (err) {
+    console.error('[お問い合わせ更新エラー]', err);
+    res.status(500).json({ message: '更新に失敗しました' });
   }
 });
 

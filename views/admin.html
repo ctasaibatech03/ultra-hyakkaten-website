@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>お問い合わせ一覧 | ウルトラ百貨店</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --color-bg: #FAF7F2;
+    --color-surface: #FFFFFF;
+    --color-text: #2B2825;
+    --color-text-sub: #5C574F;
+    --color-accent: #A6824F;
+    --color-accent-dark: #7C5E38;
+    --color-border: #E4DDD0;
+    --font-heading: "Noto Serif JP", serif;
+    --font-body: "Noto Sans JP", sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: var(--font-body);
+    color: var(--color-text);
+    background: var(--color-bg);
+  }
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding: 24px 32px;
+    border-bottom: 1px solid var(--color-border);
+    background: var(--color-surface);
+  }
+  h1 {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-size: 22px;
+  }
+  .login-user {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    color: var(--color-text-sub);
+  }
+  .login-user strong { color: var(--color-text); }
+  button#logout {
+    font-family: var(--font-body);
+    font-size: 13px;
+    padding: 6px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    background: var(--color-surface);
+    color: var(--color-text-sub);
+    cursor: pointer;
+  }
+  button#logout:hover { background: #F2ECE1; }
+  main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 32px;
+  }
+  .toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .count {
+    color: var(--color-text-sub);
+    font-size: 14px;
+  }
+  button#reload {
+    font-family: var(--font-body);
+    font-size: 14px;
+    padding: 8px 16px;
+    border: 1px solid var(--color-accent);
+    border-radius: 4px;
+    background: var(--color-surface);
+    color: var(--color-accent-dark);
+    cursor: pointer;
+  }
+  button#reload:hover { background: var(--color-accent); color: #fff; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+  }
+  th, td {
+    text-align: left;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--color-border);
+    font-size: 14px;
+    vertical-align: top;
+  }
+  th {
+    background: #F2ECE1;
+    color: var(--color-text-sub);
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  td.message {
+    white-space: pre-wrap;
+    max-width: 420px;
+  }
+  td.datetime, td.tel, td.status { white-space: nowrap; }
+  tr:last-child td { border-bottom: none; }
+  select.status-select {
+    font-family: var(--font-body);
+    font-size: 14px;
+    padding: 6px 8px;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    background: var(--color-surface);
+    color: var(--color-text);
+  }
+  select.status-select:disabled { opacity: 0.6; }
+  .state {
+    color: var(--color-text-sub);
+    padding: 24px 0;
+  }
+  .error-msg {
+    color: #A33B3B;
+    background: #FBEAEA;
+    border: 1px solid #E5B4B4;
+    border-radius: 4px;
+    padding: 10px 14px;
+    margin: 0 0 16px;
+    font-size: 14px;
+  }
+  td.actions { white-space: nowrap; }
+  .edit-input, .edit-textarea {
+    font-family: var(--font-body);
+    font-size: 14px;
+    padding: 6px 8px;
+    border: 1px solid var(--color-accent);
+    border-radius: 4px;
+    background: var(--color-surface);
+    color: var(--color-text);
+    width: 100%;
+  }
+  .edit-textarea { resize: vertical; min-height: 60px; }
+  .row-btn {
+    font-family: var(--font-body);
+    font-size: 13px;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 6px;
+  }
+  .edit-btn, .save-btn {
+    border: 1px solid var(--color-accent);
+    background: var(--color-surface);
+    color: var(--color-accent-dark);
+  }
+  .edit-btn:hover, .save-btn:hover { background: var(--color-accent); color: #fff; }
+  .cancel-btn {
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    color: var(--color-text-sub);
+  }
+  .cancel-btn:hover { background: var(--color-bg-alt, #F2ECE1); }
+  .row-btn:disabled { opacity: 0.6; cursor: default; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>お問い合わせ一覧</h1>
+  <div class="login-user" id="login-user" hidden>
+    <span><strong id="login-user-name"></strong> でログイン中</span>
+    <button type="button" id="logout">ログアウト</button>
+  </div>
+</header>
+
+<main>
+  <div class="toolbar">
+    <p class="count" id="count"></p>
+    <button type="button" id="reload">更新</button>
+  </div>
+
+  <p class="error-msg" id="error-msg" hidden></p>
+  <p class="state" id="state">読み込み中...</p>
+  <table id="table" hidden>
+    <thead>
+      <tr>
+        <th>受付日時</th>
+        <th>お名前</th>
+        <th>メールアドレス</th>
+        <th>電話番号</th>
+        <th>お問い合わせ内容</th>
+        <th>状態</th>
+        <th id="actions-header" hidden>操作</th>
+      </tr>
+    </thead>
+    <tbody id="table-body"></tbody>
+  </table>
+</main>
+
+<script>
+  const state = document.getElementById('state');
+  const table = document.getElementById('table');
+  const tableBody = document.getElementById('table-body');
+  const count = document.getElementById('count');
+  const errorMsg = document.getElementById('error-msg');
+  const STATUSES = ['未対応', '対応中', '対応済み'];
+
+  let contacts = [];
+  let canEdit = false; // 権限が確認できるまでは閲覧のみで表示する
+
+  // ログイン切れなら401が返るのでログイン画面へ戻す
+  async function adminFetch(url, options) {
+    const res = await fetch(url, options);
+    if (res.status === 401) {
+      location.href = '/login';
+      throw new Error('ログインしてください');
+    }
+    return res;
+  }
+
+  async function loadMe() {
+    try {
+      const res = await adminFetch('/api/admin/me');
+      if (!res.ok) return;
+      const me = await res.json();
+      canEdit = me.canEdit === true;
+      document.getElementById('actions-header').hidden = !canEdit;
+      document.getElementById('login-user-name').textContent = `${me.label}（${me.id}）`;
+      document.getElementById('login-user').hidden = false;
+    } catch (err) {
+      // 取得できなかった場合は閲覧のみの表示になる
+    }
+  }
+  let editingId = null;
+
+  function showError(msg) {
+    errorMsg.textContent = msg;
+    errorMsg.hidden = false;
+  }
+
+  function clearError() {
+    errorMsg.hidden = true;
+    errorMsg.textContent = '';
+  }
+
+  function formatDate(iso) {
+    const d = new Date(iso);
+    return d.toLocaleString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+  }
+
+  function escapeHtml(str) {
+    return String(str ?? '').replace(/[&<>"']/g, (c) => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[c]));
+  }
+
+  function renderRow(c) {
+    if (!canEdit) {
+      return `
+        <tr data-id="${c.id}">
+          <td class="datetime">${formatDate(c.created_at)}</td>
+          <td>${escapeHtml(c.name)}</td>
+          <td>${escapeHtml(c.email)}</td>
+          <td class="tel">${escapeHtml(c.tel) || '-'}</td>
+          <td class="message">${escapeHtml(c.message)}</td>
+          <td class="status">${escapeHtml(c.status)}</td>
+        </tr>
+      `;
+    }
+
+    const statusSelect = `
+      <select class="status-select" data-id="${c.id}" data-current="${c.status}">
+        ${STATUSES.map((s) => `<option value="${s}" ${s === c.status ? 'selected' : ''}>${s}</option>`).join('')}
+      </select>
+    `;
+
+    if (editingId === c.id) {
+      return `
+        <tr data-id="${c.id}">
+          <td class="datetime">${formatDate(c.created_at)}</td>
+          <td><input type="text" class="edit-input" data-field="name" value="${escapeHtml(c.name)}"></td>
+          <td><input type="email" class="edit-input" data-field="email" value="${escapeHtml(c.email)}"></td>
+          <td><input type="tel" class="edit-input" data-field="tel" value="${escapeHtml(c.tel)}"></td>
+          <td><textarea class="edit-textarea" data-field="message">${escapeHtml(c.message)}</textarea></td>
+          <td class="status">${statusSelect}</td>
+          <td class="actions">
+            <button type="button" class="row-btn save-btn" data-id="${c.id}">保存</button>
+            <button type="button" class="row-btn cancel-btn" data-id="${c.id}">キャンセル</button>
+          </td>
+        </tr>
+      `;
+    }
+
+    return `
+      <tr data-id="${c.id}">
+        <td class="datetime">${formatDate(c.created_at)}</td>
+        <td>${escapeHtml(c.name)}</td>
+        <td>${escapeHtml(c.email)}</td>
+        <td class="tel">${escapeHtml(c.tel) || '-'}</td>
+        <td class="message">${escapeHtml(c.message)}</td>
+        <td class="status">${statusSelect}</td>
+        <td class="actions">
+          <button type="button" class="row-btn edit-btn" data-id="${c.id}">編集</button>
+        </td>
+      </tr>
+    `;
+  }
+
+  function renderTable() {
+    tableBody.innerHTML = contacts.map(renderRow).join('');
+    count.textContent = `${contacts.length}件`;
+  }
+
+  async function load() {
+    state.hidden = false;
+    state.textContent = '読み込み中...';
+    table.hidden = true;
+    count.textContent = '';
+    editingId = null;
+    clearError();
+
+    try {
+      const res = await adminFetch('/api/admin/contacts');
+      if (!res.ok) throw new Error('取得に失敗しました');
+      contacts = await res.json();
+
+      if (contacts.length === 0) {
+        state.textContent = 'お問い合わせはまだありません。';
+        return;
+      }
+
+      renderTable();
+      state.hidden = true;
+      table.hidden = false;
+    } catch (err) {
+      state.textContent = '読み込みに失敗しました。時間をおいて再度お試しください。';
+    }
+  }
+
+  tableBody.addEventListener('change', async (e) => {
+    const select = e.target;
+    if (!select.classList.contains('status-select')) return;
+
+    const id = select.dataset.id;
+    const newStatus = select.value;
+    const previousStatus = select.dataset.current || newStatus;
+    select.disabled = true;
+    clearError();
+
+    try {
+      const res = await adminFetch(`/api/admin/contacts/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus })
+      });
+      if (!res.ok) throw new Error('更新に失敗しました');
+      select.dataset.current = newStatus;
+      const contact = contacts.find((c) => String(c.id) === String(id));
+      if (contact) contact.status = newStatus;
+    } catch (err) {
+      select.value = previousStatus;
+      showError('状態の更新に失敗しました。時間をおいて再度お試しください。');
+    } finally {
+      select.disabled = false;
+    }
+  });
+
+  tableBody.addEventListener('click', async (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+
+    const id = btn.dataset.id;
+
+    if (btn.classList.contains('edit-btn')) {
+      clearError();
+      editingId = Number(id);
+      renderTable();
+      return;
+    }
+
+    if (btn.classList.contains('cancel-btn')) {
+      clearError();
+      editingId = null;
+      renderTable();
+      return;
+    }
+
+    if (btn.classList.contains('save-btn')) {
+      clearError();
+      const row = btn.closest('tr');
+      const name = row.querySelector('[data-field="name"]').value.trim();
+      const email = row.querySelector('[data-field="email"]').value.trim();
+      const tel = row.querySelector('[data-field="tel"]').value.trim();
+      const message = row.querySelector('[data-field="message"]').value.trim();
+
+      if (!name || !email || !message) {
+        showError('お名前・メールアドレス・お問い合わせ内容は必須です。');
+        return;
+      }
+
+      const buttons = row.querySelectorAll('button');
+      buttons.forEach((b) => (b.disabled = true));
+
+      try {
+        const res = await adminFetch(`/api/admin/contacts/${id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, tel, message })
+        });
+        if (!res.ok) {
+          const body = await res.json().catch(() => ({}));
+          throw new Error(body.message || '更新に失敗しました');
+        }
+
+        const contact = contacts.find((c) => String(c.id) === String(id));
+        if (contact) Object.assign(contact, { name, email, tel: tel || null, message });
+        editingId = null;
+        renderTable();
+      } catch (err) {
+        showError(err.message || '更新に失敗しました。時間をおいて再度お試しください。');
+        buttons.forEach((b) => (b.disabled = false));
+      }
+    }
+  });
+
+  document.getElementById('reload').addEventListener('click', load);
+  document.getElementById('logout').addEventListener('click', async () => {
+    try {
+      await fetch('/api/logout', { method: 'POST' });
+    } finally {
+      location.href = '/login';
+    }
+  });
+  loadMe().then(load);
+</script>
+
+</body>
+</html>

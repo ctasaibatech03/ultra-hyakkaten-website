@@ -9,6 +9,13 @@ const PORT = 3000;
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 app.use(express.json());
+
+// ---- トップページ ----
+
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ---- 管理画面ログイン ----

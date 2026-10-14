@@ -6,6 +6,9 @@ const { Resend } = require('resend');
 
 const app = express();
 const PORT = 3000;
+
+// Vercel ではプロキシ経由になるため、X-Forwarded-For から接続元IPを取る
+if (process.env.VERCEL) app.set('trust proxy', true);
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 app.use(express.json());
@@ -27,7 +30,8 @@ const ADMIN_USERS = {
 
 const SESSION_COOKIE = 'admin_sid';
 const SESSION_TTL_MS = 8 * 60 * 60 * 1000; // 8時間
-const sessions = new Map(); // sid -> { userId, expiresAt }
+// サーバーレスではメモリが共有されないため、ログイン状態は署名付きCookieに持たせる
+const SESSION_SECRET = process.env.SESSION_SECRET;
 
 const LOGIN_MAX_FAILURES = 5;
 const LOGIN_LOCK_MS = 15 * 60 * 1000; // 15分
@@ -48,16 +52,31 @@ function getCookie(req, name) {
   return null;
 }
 
+function sign(data) {
+  return crypto.createHmac('sha256', SESSION_SECRET).update(data).digest('base64url');
+}
+
+function createSessionToken(userId) {
+  const payload = Buffer.from(JSON.stringify({ userId, expiresAt: Date.now() + SESSION_TTL_MS })).toString('base64url');
+  return `${payload}.${sign(payload)}`;
+}
+
 function getSession(req) {
-  const sid = getCookie(req, SESSION_COOKIE);
-  if (!sid) return null;
-  const session = sessions.get(sid);
-  if (!session) return null;
-  if (session.expiresAt < Date.now()) {
-    sessions.delete(sid);
+  if (!SESSION_SECRET) return null;
+  const token = getCookie(req, SESSION_COOKIE);
+  if (!token) return null;
+  const [payload, signature] = token.split('.');
+  if (!payload || !signature || !safeEqual(signature, sign(payload))) return null;
+
+  let session;
+  try {
+    session = JSON.parse(Buffer.from(payload, 'base64url').toString());
+  } catch {
     return null;
   }
-  return { sid, ...session };
+  if (!Object.hasOwn(ADMIN_USERS, session.userId)) return null;
+  if (!(session.expiresAt > Date.now())) return null;
+  return session;
 }
 
 function sessionCookie(value, maxAgeSec) {
@@ -101,6 +120,11 @@ app.post('/api/login', (req, res) => {
     return res.status(429).json({ message: 'ログインに続けて失敗したため、しばらく時間をおいてお試しください' });
   }
 
+  if (!SESSION_SECRET) {
+    console.error('[ログインエラー] SESSION_SECRET が設定されていません');
+    return res.status(500).json({ message: 'ログイン機能の設定が完了していません' });
+  }
+
   const { id, password } = req.body || {};
   const user = Object.hasOwn(ADMIN_USERS, id) ? ADMIN_USERS[id] : null;
 
@@ -114,16 +138,12 @@ app.post('/api/login', (req, res) => {
   }
 
   loginFailures.delete(ip);
-  const sid = crypto.randomBytes(32).toString('hex');
-  sessions.set(sid, { userId: id, expiresAt: Date.now() + SESSION_TTL_MS });
-  res.setHeader('Set-Cookie', sessionCookie(sid, SESSION_TTL_MS / 1000));
+  res.setHeader('Set-Cookie', sessionCookie(createSessionToken(id), SESSION_TTL_MS / 1000));
   console.log(`[ログイン] ${new Date().toLocaleString('ja-JP')} ID:${id}`);
   res.json({ message: 'ログインしました' });
 });
 
 app.post('/api/logout', (req, res) => {
-  const session = getSession(req);
-  if (session) sessions.delete(session.sid);
   res.setHeader('Set-Cookie', sessionCookie('', 0));
   res.json({ message: 'ログアウトしました' });
 });
@@ -293,6 +313,11 @@ app.patch('/api/admin/contacts/:id', requireLoginApi, requireEditor, async (req,
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`サーバーを起動しました: http://localhost:${PORT}`);
-});
+// ローカルでは直接起動し、Vercel ではサーバーレス関数として app を渡す
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`サーバーを起動しました: http://localhost:${PORT}`);
+  });
+}
+
+module.exports = app;

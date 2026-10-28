@@ -272,6 +272,31 @@ main { padding-top: var(--header-height); }
 
 .btn-primary:hover { background: var(--color-accent-dark); }
 
+/* ポップなボタン(ヒーロー用) */
+.btn-pop {
+  padding: 18px 40px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #FF8A5B, #FF5E8A);
+  color: #fff;
+  font-size: 17px;
+  font-weight: 700;
+  box-shadow: 0 6px 0 #C93E67, 0 12px 20px rgba(255, 94, 138, .35);
+  transition: transform .15s, box-shadow .15s;
+}
+
+.btn-pop::after { content: " →"; }
+
+.btn-pop:hover {
+  background: linear-gradient(135deg, #FF9A6E, #FF6F98);
+  transform: translateY(-3px) scale(1.04);
+  box-shadow: 0 9px 0 #C93E67, 0 16px 24px rgba(255, 94, 138, .4);
+}
+
+.btn-pop:active {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 #C93E67, 0 4px 8px rgba(255, 94, 138, .3);
+}
+
 /* ---------- 5客層入口 ---------- */
 .segments { background: var(--color-bg); }
 
